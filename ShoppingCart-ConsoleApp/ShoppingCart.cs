@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ShoppingCart_ConsoleApp
 {
     public class ShoppingCart
     {
+        public enum DiscountType { BuyOneGetOne = 1, ThreeForTwo = 2 };
+
         static void Main(string[] args)
         {
             Console.WriteLine("\n\t\t\t\t Welcome to Shopping Cart !!");
@@ -20,8 +19,8 @@ namespace ShoppingCart_ConsoleApp
            */
             var items = new List<Item>
             {
-                new Item { Id =1,  Name = "Apple" , Price = 0.60M },
-                new Item { Id = 2, Name = "Orange" , Price = 0.25M }
+                new Item { Id =1,  Name = "Apple" , Price = 0.60M, DiscountType = 1 },
+                new Item { Id = 2, Name = "Orange" , Price = 0.25M, DiscountType = 2 }
             };
 
             try
@@ -30,9 +29,9 @@ namespace ShoppingCart_ConsoleApp
 
             ContinueStepLoop: GetInputValuesFromUser(items);
 
-                DisplayFinalItemsList(items,"Shopping Item List");
+                DisplayFinalItemsList(items, "Shopping Item List");
 
-                Console.WriteLine("Press 1 for Continue Shopping (OR) \nPress 2 for CheckOut");
+                Console.WriteLine("\n\n Press 1 for Shopping  \n Press 2 for CheckOut");
                 var toProcess = Console.ReadLine();
 
                 if (toProcess == "1")
@@ -116,6 +115,8 @@ namespace ShoppingCart_ConsoleApp
             DisplayFinalItemsList(items, "Checkout Items List");
 
             CalculateTotalAmount(items);
+
+            DiscountPriceDetails(items);
         }
 
         private static void CalculateTotalAmount(List<Item> items)
@@ -127,13 +128,12 @@ namespace ShoppingCart_ConsoleApp
                 totalAmount += (item.Quantity * item.Price);
             }
 
-            Console.WriteLine("\t\t TotalAmount: £" + totalAmount);
-
+            Console.WriteLine("\t\t\t\t\t\tTotalAmount: £" + totalAmount + "\n");
         }
 
         private static void DisplayFinalItemsList(List<Item> items, string titleList)
         {
-            Console.WriteLine("\t"+ titleList);
+            Console.WriteLine("\t" + titleList);
             Console.WriteLine("\t--------------------------------------------------------");
 
             var dataTable = new DataTable("Items");
@@ -153,7 +153,6 @@ namespace ShoppingCart_ConsoleApp
             {
                 Console.WriteLine("\t {0}\t\t {1}\t\t {2}\t\t{3}", dr[0], dr[1], dr[2], dr[3]);
             }
-            Console.WriteLine("\n");
         }
 
         public static string GetValues(string input)
@@ -179,5 +178,63 @@ namespace ShoppingCart_ConsoleApp
             }
             return "";
         }
+
+        private static void DiscountPriceDetails(List<Item> items)
+        {
+            Console.WriteLine("\n\t\t************Offer Details ***********");
+            /*
+             * ToDo: instead of hardcoding, can get this values from enum type.
+             */
+            Console.WriteLine("\t\t 1. Apple Buy One Get One  ");
+            Console.WriteLine("\t\t 2. Oranges Three for Two \n ");
+            decimal totalDiscountAmount = 0;
+            foreach (var item in items)
+            {
+                decimal itemPrice = CalculateAmountByDiscountType(item.Quantity, item.Price, item.DiscountType);
+                totalDiscountAmount += itemPrice;
+                Console.WriteLine("\t\t Discount Amount for " + item.Name + " is : £" + itemPrice);
+            }
+
+            Console.WriteLine("\n\t\t\t\t Total Amount to pay : £" + totalDiscountAmount);
+        }
+
+        public static decimal CalculateAmountByDiscountType(int numberOfItems, decimal itemPrice, int discountType)
+        {
+            decimal itemCost = 0;
+
+            switch (discountType)
+            {
+                case 1:
+                    if (numberOfItems % 2 == 0)
+                    {
+                        itemCost = (numberOfItems / 2) * itemPrice;
+                    }
+                    else
+                    {
+                        itemCost = ((numberOfItems / 2) + (numberOfItems % 2)) * itemPrice;
+
+                    }
+                    break;
+                case 2:
+
+                    int quotient = (numberOfItems / 3);
+                    int reminder = (numberOfItems % 3);
+
+                    if (reminder != 0)
+                    {
+                        itemCost = (quotient * 2 * itemPrice)
+                                    + (reminder * itemPrice);
+                    }
+                    else
+                    {
+                        itemCost = quotient * 2 * itemPrice;
+                    }
+
+                    break;
+            }
+
+            return itemCost;
+        }
+
     }
 }

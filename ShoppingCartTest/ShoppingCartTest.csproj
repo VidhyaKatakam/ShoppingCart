@@ -47,6 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ShoppingCartCalculateTotalByDiscountTypeBuyOneGetOne.cs" />
+    <Compile Include="ShoppingCartCalculateTotalByDiscountTypeBuyThreeForTwo.cs" />
     <Compile Include="ShoppingCartInputsOnItemTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
